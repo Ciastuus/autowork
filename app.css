@@ -74,3 +74,19 @@
 
 #shortcutStatus{max-width:175px;overflow-wrap:anywhere;color:#d8ba83}
 @media(max-width:800px){.canvas-parent>canvas{will-change:contents}.job-stats{max-height:190px}}
+
+/* Remote source configuration (GitHub Pages / private Tailscale) */
+.source-open{cursor:pointer;border:1px solid #8b9b75;border-radius:7px;background:#243629;color:#e6edc6;font:700 12px Tahoma,sans-serif;padding:10px 12px;white-space:nowrap}
+.source-overlay[hidden]{display:none!important}
+.source-overlay{position:fixed;inset:0;z-index:300;background:#070c11dc;display:flex;align-items:center;justify-content:center;padding:18px}
+.source-dialog{width:min(100%,500px);max-height:90dvh;overflow:auto;border:2px solid #8a7653;border-radius:12px;background:#172231;color:#e6e7d7;box-shadow:0 25px 65px #000b;padding:22px;font:14px/1.6 Tahoma,sans-serif}
+.source-head{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#f8d49a;letter-spacing:.5px}
+.source-head button{background:transparent;border:0;color:#eee;font-size:22px;cursor:pointer}
+.source-dialog label{display:block;margin:18px 0 6px;font-weight:700}
+.source-dialog input{display:block;width:100%;box-sizing:border-box;padding:12px 11px;font:14px Consolas,monospace;color:#efffe0;background:#10191f;border:1px solid #839478;border-radius:7px}
+.source-dialog #sourceError{display:block;min-height:22px;color:#ff9d9d}
+.source-actions{display:flex;gap:10px;flex-wrap:wrap}
+.source-actions button{cursor:pointer;background:#334b36;color:#f8f3e0;border:1px solid #8ca47d;border-radius:7px;padding:11px 16px;font-weight:700}
+.source-actions button:last-child{background:#282c35;border-color:#68717b}
+.source-note{font-size:12px;opacity:.72}
+@media(max-width:800px){.source-open{font-size:10px;padding:7px 8px}.source-dialog{padding:17px}.source-overlay{align-items:center}}
