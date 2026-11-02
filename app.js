@@ -12,12 +12,12 @@
   try { storedSource = localStorage.getItem('aw-live-source') || ''; } catch (_) {}
   const dataBase = storedSource.replace(/\/+$/, '');
   const demo = sourceParams.has('demo') || (!dataBase && (location.hostname.endsWith('.github.io') || location.protocol==='file:'));
-  let state = null, graph = {markers:[],manual:[],learned:[],stairs:[],drops:[]};
+  let state = null, graph = {markers:[],manual:[],learned:[],stairs:[],drops:[],crates:[]};
   let routeTab = 'manual', chosenRoute = null, floorFilter = 'auto', ready = false;
   let center = {x:1280,y:-16}, zoom = 18, scaleFit = false, following = true;
   let w=1,h=1,dpr=1, dragging=false, dragged=false, startPoint=null;
   let trail=[], lastSession=null, lastTick=null, ignoredLogs=false, lastLogKey='';
-  const layers = {manual:'manualLayer', learned:'learnedLayer', stairs:'stairsLayer',active:'activeLayer',trail:'trailLayer'};
+  const layers = {manual:'manualLayer', learned:'learnedLayer', stairs:'stairsLayer',active:'activeLayer',trail:'trailLayer',crates:'cratesLayer'};
   const color = {manual:'#fff1bf',learned:'#668e75',stairs:'#eea93f',active:'#f8ee95',target:'#d94735',trail:'#685944'};
   const num = (n,d=1) => typeof n === 'number' && Number.isFinite(n) ? n.toFixed(d) : '—';
   const txt = (id,s) => { const node=$(id); if(node) node.textContent=String(s); };
@@ -147,6 +147,15 @@
       if(zoomShow && opacity>.4)textAt(marker,marker.name||'#'+marker.id,'#f6f1d6',-11);
       ctx.globalAlpha=1;
     }
+    if(layer('crates')) for(const c of graph.crates||[]){
+      if(state?.player?.interior!=null && c.interior!==state.player.interior)continue;
+      const opacity=floorAlpha(c.z);if(opacity<.3)continue;
+      const xx=px(c.x),yy=py(c.y);if(xx< -20||yy< -20||xx>w+20||yy>h+20)continue;
+      ctx.globalAlpha=opacity;ctx.fillStyle='#713f21';ctx.fillRect(xx-6,yy-5,12,10);
+      ctx.strokeStyle='#f5ce76';ctx.lineWidth=1.7;ctx.strokeRect(xx-6,yy-5,12,10);
+      ctx.beginPath();ctx.moveTo(xx-6,yy-5);ctx.lineTo(xx+6,yy+5);ctx.moveTo(xx+6,yy-5);ctx.lineTo(xx-6,yy+5);ctx.stroke();
+      if(zoom>13)textAt(c,'SKRZYNIA #'+c.id,'#efbd73',-12);
+    }
     ctx.globalAlpha=1;
   }
   function drawDynamicWorld(){
@@ -221,6 +230,32 @@
     if(state?.target)pts.push(state.target);
     return pts.filter(pointInside);
   }
+  function cratePointsInCurrentInterior(){
+    const here=state?.player?.interior;
+    return (graph.crates||[]).filter(c=>pointInside(c)&&(here==null||c.interior===here));
+  }
+  function fitCrates(){
+    const found=cratePointsInCurrentInterior();
+    if(!found.length){txt('nearestCrateValue','Brak znalezionych');return;}
+    fitMap(found);
+  }
+  function renderCrateList(){
+    const node=$('crateList');if(!node)return;
+    node.replaceChildren();
+    const found=cratePointsInCurrentInterior();
+    txt('crateScanCount',(graph.crates||[]).length+' zapisanych');
+    txt('crateCount',(graph.crates||[]).length);
+    if(!found.length){const p=document.createElement('div');p.className='job-empty';p.textContent='Jeszcze nie wykryto skrzyń w tym wnętrzu. Odkrywaj teren, aby zapisać napisy „Skrzynia”.';node.append(p);return;}
+    const player=state?.player;
+    const sorted=found.slice().sort((a,b)=>player?dist(a,player)-dist(b,player):a.id-b.id);
+    for(const c of sorted.slice(0,50)){
+      const b=document.createElement('button');b.className='crate-item';b.type='button';
+      const m=player?' • '+num(dist(c,player))+' m':'';
+      b.textContent='#'+c.id+'  X '+num(c.x,1)+' / Y '+num(c.y,1)+' / Z '+num(c.z,1)+m;
+      b.addEventListener('click',()=>{center={x:c.x,y:c.y};zoom=Math.max(zoom,18);following=false;scaleFit=false;render();});
+      node.append(b);
+    }
+  }
   function fitMap(points=null){
     const pts=points||allPoints();if(!pts.length)return;
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
@@ -285,6 +320,10 @@
         const id=document.createElement('small');id.textContent='#'+r.id;const value=document.createElement('b');value.textContent=r.text;el.append(id,value);jobNode.append(el);}
     }
     txt('jobStatsLabel',statsRows.length+' ODNOTOWANYCH');
+    txt('crateCount',s.crateCount??graph.crates?.length??0);
+    txt('crateScanCount',(s.crateCount??graph.crates?.length??0)+' zapisanych');
+    const nc=s.nearestCrate;const ci=nc?(graph.crates||[]).find(c=>Math.abs(c.x-nc.x)<.08&&Math.abs(c.y-nc.y)<.08):null;
+    txt('nearestCrateValue',nc?((ci?'#'+ci.id+' • ':'')+num(nc.distanceXY)+' m'):'—');
     txt('blockedStatus',(s.blockedPoints?.length||0)+' punktów • '+(s.blockedRepeats||0)+' powt.');
     txt('shortcutStatus',s.checkpointShortcut||'—');
     txt('recordValue',s.recording?`${s.recording.points} punktów`:'—');
@@ -324,8 +363,8 @@
     render();
   }
   function updateMap(m){
-    graph={markers:m.markers||[],manual:m.manual||[],learned:m.learned||[],stairs:m.stairs||[],drops:m.drops||[]};
-    staticGeneration++;renderRouteList();
+    graph={markers:m.markers||[],manual:m.manual||[],learned:m.learned||[],stairs:m.stairs||[],drops:m.drops||[],crates:m.crates||[]};
+    staticGeneration++;renderRouteList();renderCrateList();
     ready=Boolean(state?.player)||allPoints().length>0;
     $('emptyOverlay').hidden=ready;
     if(!scaleFit && !following && allPoints().length)fitMap();
@@ -365,10 +404,11 @@
       floorFilter=btn.dataset.floor;
       for(const b of $('floorControls').querySelectorAll('button'))b.classList.toggle('active',b===btn);render();});
     $('fitButton').addEventListener('click',()=>fitMap());
+    $('focusCrates').addEventListener('click',fitCrates);
     $('focusButton').addEventListener('click',focusPlayer);
     $('zoomIn').addEventListener('click',()=>{zoom=Math.min(85,zoom*1.4);render();});
     $('zoomOut').addEventListener('click',()=>{zoom=Math.max(.7,zoom/1.4);render();});
-    for(const name of Object.values(layers))$(name).addEventListener('change',render);
+    for(const name of Object.values(layers))$(name).addEventListener('change',()=>{staticGeneration++;render();});
     for(const type of ['Manual','Learned','Stairs'])$('tab'+type).addEventListener('click',()=>{
       routeTab=type.toLowerCase();chosenRoute=null;
       for(const c of ['Manual','Learned','Stairs'])$('tab'+c).classList.toggle('active',c===type);
@@ -460,7 +500,7 @@
       {id:2,from:3,to:4,seconds:5.8,success:7,fails:1,points:[{x:1274,y:-16,z:1002.43},{x:1274,y:-24,z:1002.43},{x:1264,y:-24,z:1002.43}]},
       {id:3,from:2,to:5,seconds:4.8,success:4,fails:0,points:[{x:1281,y:-20,z:1000.85},{x:1281,y:-29,z:1000.85},{x:1287,y:-29,z:1000.85}]}],
       learned:[{id:1,seconds:3.9,success:3,fails:0,points:[{x:1287,y:-29,z:1000.85},{x:1282,y:-27,z:1000.85},{x:1281,y:-20,z:1000.85}]}],
-      stairs:[{id:1,name:'oryginalna-40',points:stairs}],drops:[]};
+      stairs:[{id:1,name:'oryginalna-40',points:stairs}],drops:[],crates:[{id:1,x:1275.4,y:-19.4,z:1002.43,interior:18},{id:2,x:1271.2,y:-22.1,z:1002.43,interior:18}]};
     updateMap(graph);
     let frame=0;
     const steps=[{x:1274.1,y:-15.9,z:1002.43},{x:1274,y:-18,z:1002.43},
@@ -472,7 +512,7 @@
         distanceXY:dist(p,t),dz:t.z-p.z,routeIndex:Math.floor(frame/8)%5+1,routeTotal:5,routeType:'manual',
         activeRoute:steps.slice(Math.floor(frame/8)%5),attempts:0,maxAttempts:4,retryCycles:0,maxRetryCycles:3,
         resume:{count:1,max:3,status:'T2 od punktu 4'},
-        checkpointShortcut:'checkpoint ma pierwszeństwo przed M/S',
+        checkpointShortcut:'checkpoint ma pierwszeństwo przed M/S',crateCount:2,nearestCrate:{...graph.crates[0],distanceXY:dist(p,graph.crates[0])},
         jobText:[{id:'41',text:'Magazynier: 4 / 8 paczek'},{id:'44',text:'Zarobek: $1200'}],
         blockedPoints:[{x:1277,y:-18,z:1002.43,hits:2}],blockedRepeats:1,
         markerCount:graph.markers.length,manualCount:graph.manual.length,learnedCount:graph.learned.length,stairCount:1,
