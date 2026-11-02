@@ -5,7 +5,13 @@
   const liveCtx=canvas.getContext('2d',{alpha:true}), staticCtx=staticCanvas.getContext('2d',{alpha:false});
   let ctx=liveCtx, staticKey='', staticGeneration=0, requestScheduled=false;
   let shownPlayer=null, lastFrameAt=0;
-  const demo = new URLSearchParams(location.search).has('demo') || location.hostname.endsWith('.github.io') || location.protocol==='file:';
+  // Public GitHub Pages hosts only the interface. The private source HTTPS
+  // is remembered solely in this browser; it is never committed to GitHub.
+  const sourceParams = new URLSearchParams(location.search);
+  let storedSource = '';
+  try { storedSource = localStorage.getItem('aw-live-source') || ''; } catch (_) {}
+  const dataBase = storedSource.replace(/\/+$/, '');
+  const demo = sourceParams.has('demo') || (!dataBase && (location.hostname.endsWith('.github.io') || location.protocol==='file:'));
   let state = null, graph = {markers:[],manual:[],learned:[],stairs:[],drops:[]};
   let routeTab = 'manual', chosenRoute = null, floorFilter = 'auto', ready = false;
   let center = {x:1280,y:-16}, zoom = 18, scaleFit = false, following = true;
@@ -326,8 +332,35 @@
     render();
   }
   function setup(){
+    const sourceOverlay=$('sourceOverlay'), sourceInput=$('sourceInput');
+    const hideSource=()=>{sourceOverlay.hidden=true;};
+    $('sourceOpen').addEventListener('click',()=>{
+      sourceInput.value=dataBase;
+      txt('sourceError','');
+      sourceOverlay.hidden=false;
+      sourceInput.focus();
+    });
+    $('sourceClose').addEventListener('click',hideSource);
+    sourceOverlay.addEventListener('click',e=>{if(e.target===sourceOverlay)hideSource();});
+    window.addEventListener('keydown',e=>{if(e.key==='Escape')hideSource();});
+    $('sourceConnect').addEventListener('click',()=>{
+      try {
+        const url=new URL(sourceInput.value.trim());
+        if(url.protocol!=='https:' || url.username || url.password || url.search || url.hash) {
+          throw new Error('Podaj prywatny adres HTTPS bez hasła ani dodatkowych parametrów.');
+        }
+        localStorage.setItem('aw-live-source',url.origin);
+        location.assign(location.pathname);
+      } catch (e) {
+        txt('sourceError',e.message||'Niepoprawny adres.');
+      }
+    });
+    $('sourceDemo').addEventListener('click',()=>{
+      try { localStorage.removeItem('aw-live-source'); } catch (_) {}
+      location.assign(location.pathname+'?demo=1');
+    });
     const host=document.querySelector('.server-address');
-    if(host)host.textContent=location.protocol==='file:'?'Podgląd HTML':location.host;
+    if(host)host.textContent=dataBase?'ZDALNY LIVE':location.protocol==='file:'?'Podgląd HTML':location.host;
     $('floorControls').addEventListener('click',ev=>{const btn=ev.target.closest('button[data-floor]');if(!btn)return;
       floorFilter=btn.dataset.floor;
       for(const b of $('floorControls').querySelectorAll('button'))b.classList.toggle('active',b===btn);render();});
@@ -410,10 +443,10 @@
     window.addEventListener('resize',()=>{if(window.innerWidth>800)openMobile('map');resize();});
     resize();
   }
-  async function pollState(){try{const response=await fetch('/api/state',{cache:'no-store'});if(!response.ok)throw Error(response.status);updateState(await response.json());}
+  async function pollState(){try{const response=await fetch((dataBase||'')+'/api/state',{cache:'no-store',mode:'cors',credentials:'omit'});if(!response.ok)throw Error(response.status);updateState(await response.json());}
     catch(e){$('connection').className='connection offline';txt('connectionText','BRAK SERWERA');txt('mapBadge','BŁĄD POŁĄCZENIA');}}
   let lastMapBody='';
-  async function pollMap(){try{const response=await fetch('/api/map',{cache:'no-store'});if(response.status===304)return;if(response.ok){const body=await response.text();if(body!==lastMapBody){lastMapBody=body;updateMap(JSON.parse(body));}}}catch(e){/* keep last known map */}}
+  async function pollMap(){try{const response=await fetch((dataBase||'')+'/api/map',{cache:'no-store',mode:'cors',credentials:'omit'});if(response.status===304)return;if(response.ok){const body=await response.text();if(body!==lastMapBody){lastMapBody=body;updateMap(JSON.parse(body));}}}catch(e){/* keep last known map */}}
   function demoData(){
     const stairs=[
       [1290.34,-10.51,1000.85],[1287,-10.65,1000.85],[1283,-10.8,1000.85],
