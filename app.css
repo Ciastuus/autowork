@@ -90,3 +90,9 @@
 .source-actions button:last-child{background:#282c35;border-color:#68717b}
 .source-note{font-size:12px;opacity:.72}
 @media(max-width:800px){.source-open{font-size:10px;padding:7px 8px}.source-dialog{padding:17px}.source-overlay{align-items:center}}
+
+/* v21: skaner skrzyn - osobna warstwa bez przebudowy mapy w kazdej klatce */
+.l-crate{display:inline-block;width:11px;height:10px;border:2px solid #eec77e;background:#713f21;vertical-align:middle;box-sizing:border-box}
+.crate-list{display:grid;gap:6px;max-height:310px;overflow-y:auto;padding-top:9px}
+.crate-item{display:block;cursor:pointer;text-align:left;width:100%;background:#1f281e;border:1px solid #66583a;color:#f2e2bd;border-radius:5px;padding:8px 9px;font:600 12px/1.5 Consolas,monospace;overflow-wrap:anywhere}
+.crate-item:focus-visible,.crate-item:hover{background:#384632;border-color:#c09f62}
