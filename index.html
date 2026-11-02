@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark"><title>AutoWork LIVE v20 — Los Santos Mission Control</title>
+<link rel="stylesheet" href="app.css"><link rel="stylesheet" href="gta-lore.css"></head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="sa-wordmark" aria-label="San Andreas"><span class="word-small">grand theft auto</span><span class="word-main">San Andreas</span><span class="word-edition">AUTOWORK // MISSION CONTROL</span></div>
+    <div class="brand-title"><strong>LS <em>WAREHOUSE</em></strong><small>San Andreas · SA-MP · Magazynier</small></div>
+  </div>
+  <div class="top-right"><div class="hud-stats"><div class="hud-clock" id="saClock">--:--</div><div class="hud-caption">CZAS LOKALNY / PANEL</div></div><span class="server-address">Sieć lokalna</span><div class="connection" id="connection"><span class="status-dot"></span><span id="connectionText">Łączenie...</span></div></div>
+</header>
+<div class="shell">
+  <aside class="left-pane">
+    <div class="ls-art" aria-hidden="true"><svg viewBox="0 0 460 178" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sunset" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#dc9b68"/><stop offset=".56" stop-color="#edae72"/><stop offset="1" stop-color="#614330"/></linearGradient></defs><rect width="460" height="178" fill="url(#sunset)"/><circle cx="316" cy="77" r="49" fill="#fbe3a0" opacity=".76"/><path d="M0 118L30 111L30 91L66 91L66 114L91 114L91 83L112 83L112 100L131 100L131 117L154 117L154 74L168 74L168 118L206 118L206 90L226 90L226 110L257 110L257 96L282 96L282 122L326 122L326 108L355 108L355 119L393 119L393 89L414 89L414 111L460 111L460 178L0 178Z" fill="#4d3430" opacity=".7"/><path d="M0 142L460 142L460 178L0 178Z" fill="#312a22"/><path d="M40 170q23-30 75 0M290 170q24-35 70 0" stroke="#1a1c17" stroke-width="9" fill="none"/><path d="M78 170L90 42M90 55q-22-32-49-28M90 55q16-29 49-35M90 55q-7-33 8-48M90 55q-27-2-49 19M90 55q30-6 48 18" stroke="#151d17" stroke-width="9" stroke-linecap="round" fill="none"/><path d="M389 170L381 72M381 83q-25-26-45-20M381 83q17-29 45-26M381 83q-12-30 4-41M381 83q-25 1-36 27M381 83q24 0 42 25" stroke="#162018" stroke-width="8" stroke-linecap="round" fill="none"/><path d="M177 160h85l-14-27h-52z" fill="#1b1c18"/><circle cx="193" cy="161" r="10" fill="#11140f"/><circle cx="248" cy="161" r="10" fill="#11140f"/></svg><div class="ls-art-copy"><small>LOS SANTOS STORIES</small><strong>Warehouse<br>Shift.</strong></div></div>
+    <div class="section-label">KARTA POSTACI / ZMIANA <span id="timeLabel">—</span></div>
+    <section class="hero-card"><div class="hero-top"><span class="overline">MISJA: MAGAZYNIER</span><span class="tiny-chip" id="automationLabel">AUTO</span></div><div class="hero-state" id="modeValue">OCZEKIWANIE</div><div class="hero-desc" id="modeDesc">Ruszaj do następnego checkpointu. Każda trasa to kolejna dostawa.</div><div class="hero-bottom"><span class="little-label">STEROWANIE</span><span class="status-on" id="enabledValue">OFFLINE</span></div></section>
+    <div class="section-label">POSTĘP MISJI</div>
+    <div class="metric-grid"><div class="metric"><span>DO MARKERA</span><strong id="distanceValue">—</strong><small>Odległość XY</small></div><div class="metric"><span>RÓŻNICA Z</span><strong id="heightValue">—</strong><small>Wysokość celu</small></div><div class="metric"><span>PRÓBY</span><strong id="attemptValue">—</strong><small>Limit 4/4</small></div><div class="metric"><span>AUTO RETRY</span><strong id="retryValue">—</strong><small>Cykle wznowień</small></div></div>
+    <div class="section-label">KOORDYNATY / GPS</div>
+    <section class="data-card"><div class="kv"><span>Współrzędna X</span><b id="xValue">—</b></div><div class="kv"><span>Współrzędna Y</span><b id="yValue">—</b></div><div class="kv"><span>Wysokość Z</span><b id="zValue">—</b></div><div class="kv"><span>Poziom</span><b id="floorValue">—</b></div><div class="kv"><span>Waypoint</span><b id="waypointValue">—</b></div><div class="kv"><span>Tryb trasy</span><b id="routeTypeValue">—</b></div><div class="kv"><span>Dołączenie do trasy</span><b id="resumeValue">—</b></div></section>
+    <div class="section-label">RAPORT Z MAGAZYNU / TEXTDRAW <span id="jobStatsLabel">NASŁUCH</span></div>
+    <section class="data-card job-stats" id="jobStats"><div class="job-empty">Czekam na licznik ze skryptu serwera…</div></section>
+    <div class="section-label">NOTATKI MECHANIKA</div>
+    <section class="data-card mini"><div class="kv"><span>Planowanie A*</span><b id="planValue">—</b></div><div class="kv"><span>Nagrywanie</span><b id="recordValue">—</b></div><div class="kv"><span>Aktualizacja</span><b id="lastValue">—</b></div></section>
+  </aside>
+  <main class="main-pane">
+    <div class="map-title-row"><div><span class="section-label no-margin">PAUSE MENU <b class="menu-chevron">»</b> MAPA <b class="menu-chevron">»</b> WAREHOUSE</span><h1>Mapa <span class="muted-light">San Andreas</span></h1><div class="sa-map-subtitle">LOS SANTOS • PLAN TRAS I CHECKPOINTÓW • WNĘTRZE GTA:SA</div></div><div class="map-badge" id="mapBadge">OCZEKIWANIE NA DANE</div></div>
+    <div class="mobile-overview" aria-label="Bieżąca telemetria">
+      <div><span>TRYB</span><strong id="mobileMode">—</strong></div>
+      <div><span>CEL</span><strong id="mobileDistance">—</strong></div>
+      <div><span>PRÓBY</span><strong id="mobileAttempts">—</strong></div>
+      <div><span>RETRY</span><strong id="mobileRetry">—</strong></div>
+    </div>
+    <div class="map-wrap"><div class="map-paper-top"><span class="stamp-round">LS</span><div><strong>LOS SANTOS</strong><small>WAREHOUSE ROUTE ATLAS</small></div><span class="red-stamp">PROPERTY OF SA-MP</span></div>
+      <div class="map-toolbar"><div class="seg" id="floorControls"><button data-floor="auto" class="active">AUTO</button><button data-floor="lower">DÓŁ</button><button data-floor="upper">GÓRA</button><button data-floor="all">WSZYSTKIE</button></div><div class="tools"><button id="focusButton" title="Wyśrodkuj na postaci">◎ Centrum</button><button id="fitButton" title="Dopasuj całą mapę">⤢ Całość</button><button id="zoomIn" title="Przybliż">＋</button><button id="zoomOut" title="Oddal">－</button><button id="layersButton" class="layers-btn" title="Warstwy mapy" aria-expanded="false">Warstwy</button></div></div>
+      <div class="canvas-parent" id="canvasParent"><div class="hud-map-label">MAGAZYNIER / MAPA OPERACYJNA</div><div class="map-mission-label">MISSION <strong id="missionZone">WAREHOUSE INTERIOR</strong></div><canvas id="staticCanvas" aria-hidden="true"></canvas><canvas id="mapCanvas" aria-label="Mapa pozycji, markerów i tras AutoWork"></canvas><div class="crosshair-line"></div><div id="emptyOverlay" class="empty-overlay"><div class="empty-icon">⌁</div><strong>Mapa oczekuje na dane z gry</strong><span>Uruchom AutoWork LIVE oraz lokalny serwer panelu.</span><a href="?demo=1">Zobacz przykładowy podgląd</a></div><div class="map-hint"><span class="desktop-hint">Kółko myszy: zoom • Przeciągnij: przesuwanie • Kliknij trasę po prawej, aby ją wyróżnić</span><span class="touch-hint">Przesuń palcem • Rozsuń dwa palce, aby powiększyć</span></div><div class="map-coordinates" id="pointerCoords">X — / Y —</div></div>
+      <div class="map-footer"><div class="legend"><span><i class="l-player"></i> Postać</span><span><i class="l-target"></i> Cel</span><span><i class="l-manual"></i> Trasy</span><span><i class="l-learned"></i> Nauczone</span><span><i class="l-stairs"></i> Schody</span><span><i class="l-trail"></i> Ślad</span></div><div class="map-scale" id="mapScale">— m</div></div>
+    </div>
+    <div class="route-filter"><div class="section-label no-margin">MAP LEGEND / WARSTWY</div><div class="switches"><label><input type="checkbox" id="manualLayer" checked><span>Ręczne</span></label><label><input type="checkbox" id="learnedLayer" checked><span>Wyuczone</span></label><label><input type="checkbox" id="stairsLayer" checked><span>Schody</span></label><label><input type="checkbox" id="activeLayer" checked><span>Aktualna</span></label><label><input type="checkbox" id="trailLayer" checked><span>Ślad gracza</span></label></div></div>
+    <div class="bottom-cards"><div class="mini-stat"><span>POZNANE MARKERY</span><strong id="markerCount">0</strong></div><div class="mini-stat"><span>TRASY RĘCZNE</span><strong id="manualCount">0</strong></div><div class="mini-stat"><span>TRASY WYUCZONE</span><strong id="learnedCount">0</strong></div><div class="mini-stat"><span>PRZEJŚCIA PIĘTER</span><strong id="stairCount">0</strong></div></div>
+  </main>
+  <aside class="right-pane">
+    <div class="right-head"><div><span class="section-label no-margin">LOS SANTOS / RAPORT Z MISJI</span><h2>Dziennik kuriera</h2></div></div>
+    <div class="target-card"><div class="target-title"><span class="target-pulse"></span> MISSION OBJECTIVE <span id="targetId">—</span></div><div class="target-coords" id="targetCoords">Czekam na marker</div><div class="target-info" id="targetExtra">Brak celu</div></div>
+    <div class="right-section-title"><span>ODKRYTE DROGI</span><span id="routeTotalLabel">0 tras</span></div>
+    <div class="route-buttons"><button class="active" id="tabManual">Ręczne</button><button id="tabLearned">Wyuczone</button><button id="tabStairs">Schody</button></div>
+    <div class="route-list" id="routeList"><div class="list-empty">Brak zapisanych tras.</div></div>
+    <div class="data-card mini"><div class="kv"><span>Cel nadrzędny</span><b>CHECKPOINT SA-MP</b></div><div class="kv"><span>Skrót / węzeł M:S</span><b id="shortcutStatus">—</b></div></div>
+    <div class="right-section-title"><span>UTKNIĘCIA / OMIJANE PUNKTY</span><b id="blockedStatus">0 punktów</b></div><div class="right-section-title logs-title"><span>PAGER / RADIO DISPATCH</span><button id="clearLogs">Wyczyść widok</button></div>
+    <div class="logs" id="eventLogs"><div class="log-placeholder">Nasłuchuję komunikatów z magazynu...</div></div>
+    <div class="security-note">RADIO LOS SANTOS • ODCZYT DANYCH • PANEL LOKALNY</div>
+  </aside>
+</div>
+<div class="mobile-backdrop" id="mobileBackdrop" hidden></div>
+<nav class="mobile-dock" aria-label="Nawigacja po panelu">
+  <button data-mobile="map" class="active"><span class="dock-icon">⌖</span><span>Mapa</span></button>
+  <button data-mobile="status"><span class="dock-icon">▥</span><span>Status</span></button>
+  <button data-mobile="routes"><span class="dock-icon">⌁</span><span>Trasy</span></button>
+  <button data-mobile="logs"><span class="dock-icon">≡</span><span>Logi</span></button>
+</nav>
+<script src="app.js" defer></script>
+</body></html>
