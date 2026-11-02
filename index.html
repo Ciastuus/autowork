@@ -9,7 +9,7 @@
     <div class="sa-wordmark" aria-label="San Andreas"><span class="word-small">grand theft auto</span><span class="word-main">San Andreas</span><span class="word-edition">AUTOWORK // MISSION CONTROL</span></div>
     <div class="brand-title"><strong>LS <em>WAREHOUSE</em></strong><small>San Andreas · SA-MP · Magazynier</small></div>
   </div>
-  <div class="top-right"><div class="hud-stats"><div class="hud-clock" id="saClock">--:--</div><div class="hud-caption">CZAS LOKALNY / PANEL</div></div><span class="server-address">Sieć lokalna</span><div class="connection" id="connection"><span class="status-dot"></span><span id="connectionText">Łączenie...</span></div></div>
+  <div class="top-right"><button id="sourceOpen" class="source-open" type="button">Źródło LIVE</button><div class="hud-stats"><div class="hud-clock" id="saClock">--:--</div><div class="hud-caption">CZAS LOKALNY / PANEL</div></div><span class="server-address">Sieć lokalna</span><div class="connection" id="connection"><span class="status-dot"></span><span id="connectionText">Łączenie...</span></div></div>
 </header>
 <div class="shell">
   <aside class="left-pane">
@@ -60,5 +60,16 @@
   <button data-mobile="routes"><span class="dock-icon">⌁</span><span>Trasy</span></button>
   <button data-mobile="logs"><span class="dock-icon">≡</span><span>Logi</span></button>
 </nav>
+<div id="sourceOverlay" class="source-overlay" hidden>
+  <section class="source-dialog" role="dialog" aria-modal="true" aria-label="Źródło LIVE">
+    <div class="source-head"><strong>RADIO LOS SANTOS / ŹRÓDŁO LIVE</strong><button id="sourceClose" type="button">✕</button></div>
+    <p>Podaj prywatny adres HTTPS z <strong>Tailscale Serve</strong>. Zapisuje się tylko w Twojej przeglądarce, nie na GitHubie.</p>
+    <label for="sourceInput">Adres serwera</label>
+    <input id="sourceInput" type="url" spellcheck="false" placeholder="https://twoj-pc.twoja-siec.ts.net" />
+    <small id="sourceError" role="alert"></small>
+    <div class="source-actions"><button id="sourceConnect" type="button">Połącz LIVE</button><button id="sourceDemo" type="button">Tryb demo</button></div>
+    <p class="source-note">Na komputerze musi działać GTA, AW_LIVE i prywatny Tailscale Serve. Nie używaj publicznego Funnel.</p>
+  </section>
+</div>
 <script src="app.js" defer></script>
 </body></html>
